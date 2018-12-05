@@ -1,0 +1,30 @@
+<label><input type="text" id="in"> - input</label>
+<br>
+<label><input type="password" id="pass"> - passphrase</label>
+<label><input type="checkbox" id="encrypt"></label>
+<button id="btn">Encrypt</button>
+<br>
+<label><input type="text" id="out"> - output</label>
+<script>
+  const cypher = (mess, shift) => {
+    return String.fromCharCode(
+      ...mess.split('').map((sym) => {
+        sym = sym.charCodeAt(0) + shift;
+        if (sym >= 255) {
+          sym %= sym % 255;
+        } else if (sym < 0) {
+          sym = -(-sym % 255) + 255;
+        }
+        return sym;
+      }),
+    );
+  };
+
+  document.getElementById('btn').addEventListener('click', () => {
+    const shift = document.getElementById('pass').value.split('').reduce((sum, sym) => sum + sym.charCodeAt(0), 0) %
+      255
+    const input = document.getElementById('in').value
+    const way = document.getElementById('encrypt').checked
+    document.getElementById('out').value = cypher(input, way ? shift : -shift)
+  })
+</script>

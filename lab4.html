@@ -1,0 +1,74 @@
+<label>
+    Password generator:
+    <button id="gen">Generate</button>
+</label>
+<br>
+<span id="passes"><br><br><br><br></span>
+<br><br>
+<label>Password input:
+    <input type="password" id="password"> - timeout: <span id="time"></span>
+</label>
+
+<script>
+  const getPassword = (length) => {
+    const consonants = 'BCDFGHJKLMNPQRSTVXZW'
+    const vowels = 'AEIOUY'
+    let symbols = new Array(length)
+    for (let i = 0; i < symbols.length; i++) {
+      symbols[i] = Math.floor(Math.random() * 3)
+        ? consonants[Math.floor(Math.random() * consonants.length)]
+        : vowels[Math.floor(Math.random() * vowels.length)]
+      if (Math.floor(Math.random() * 2)) {
+        symbols[i] = symbols[i].toLowerCase()
+      }
+    }
+    return symbols.join('')
+  }
+
+  document.getElementById('gen').addEventListener('click', () => {
+    let passwords = new Array(5)
+    for (let i = 0; i < passwords.length; i++) {
+      passwords[i] = getPassword(50)
+    }
+    document.getElementById('passes').innerText = passwords.join('\n')
+  })
+
+  document.getElementById('password').addEventListener('keypress', (e) => {
+    if (e.which === 13) {
+      fetch(`http://localhost:8888?p=${document.getElementById('password').value}`, {
+        mode: 'no-cors',
+      })
+        .then(console.log)
+        .catch(console.error)
+    }
+  })
+
+  const time = new Date()
+  time.setMinutes(5, 0)
+  const printTime = () => {
+    let m = time.getMinutes().toString()
+    if (m < 10) {
+      m = ' ' + m
+    }
+    let s = time.getSeconds().toString()
+    if (s < 10) {
+      s = '0' + s
+    }
+    document.getElementById('time').innerText = m + ':' + s
+  }
+  printTime()
+  setInterval(() => {
+    time.setSeconds(time.getSeconds() - 1)
+    if (time.getMinutes() === 0 && time.getSeconds() === 0) {
+      document.getElementById('password').disabled = !document.getElementById('password').disabled
+      if (document.getElementById('password').disabled) {
+        document.getElementById('password').value = ''
+        document.getElementById('password').placeholder = 'Temporary blocked!'
+      } else {
+        document.getElementById('password').placeholder = ''
+      }
+      time.setMinutes(5, 0)
+    }
+    printTime()
+  }, 20)
+</script>
